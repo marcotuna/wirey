@@ -180,7 +180,7 @@ cd /vagrant
 ### on net-3
 
 ```bash
-vagrant ssh net-2
+vagrant ssh net-3
 sudo su -
 cd /vagrant
 ./bin/wirey --endpoint 192.168.33.13 --ipaddr 172.30.0.6 --etcd 192.168.33.10:2379
@@ -190,7 +190,7 @@ cd /vagrant
 
 ```bash
 vagrant ssh net-1
-ping 172.30.0.11
+ping 172.30.0.6
 ```
 
 Result:
@@ -237,4 +237,37 @@ Result:
 /wirey/wg0/59Je0kMsYkWkQ52Rt7o9Ss60QP3fTcoTQgJgsWDW/QQ=
 
 {"PublicKey":"NTlKZTBrTXNZa1drUTUyUnQ3bzlTczYwUVAzZlRjb1RRZ0pnc1dEVy9RUT0K","Endpoint":"192.168.33.12:2345","IP":"172.30.0.11"}
+```
+
+## Vault testing in local
+
+
+### on net-1
+
+```bash
+vagrant ssh net-1
+sudo -i
+export VAULT_ADDR=http://192.168.33.10:8200
+export VAULT_TOKEN=toor
+/vagrant/bin/wirey --endpoint 192.168.33.11 --ipaddr 172.30.0.4 --vault $VAULT_ADDR
+```
+
+### on net-2
+
+```bash
+vagrant ssh net-2
+sudo -i
+export VAULT_ADDR=http://192.168.33.10:8200
+export VAULT_TOKEN=toor
+/vagrant/bin/wirey --endpoint 192.168.33.12 --ipaddr 172.30.0.5 --vault $VAULT_ADDR
+```
+
+### on net-3
+
+```bash
+vagrant ssh net-3
+sudo -i
+export VAULT_ADDR=http://192.168.33.10:8200
+export VAULT_TOKEN=toor
+/vagrant/bin/wirey --endpoint 192.168.33.13 --ipaddr 172.30.0.6 --vault $VAULT_ADDR
 ```

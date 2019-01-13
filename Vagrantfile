@@ -16,15 +16,21 @@ docker run  --restart always --name etcd \
   /usr/local/bin/etcd \
   --listen-client-urls http://192.168.33.10:2379 \
   --advertise-client-urls http://192.168.33.10:2379
+docker run --restart always --name vault \
+-d --net=host --cap-add=IPC_LOCK vault:1.0.1 vault server -dev \
+-dev-listen-address=192.168.33.10:8200 \
+-dev-root-token-id=toor
+export VAULT_ADDR=http://192.168.33.10:8200
+export VAULT_TOKEN=toor
 SCRIPT
-
 $bootstrap=<<SCRIPT
 yum update -y
 yum install libmnl-devel gcc make kernel-devel wget -y
 cd /tmp
-wget https://git.zx2c4.com/WireGuard/snapshot/WireGuard-0.0.20180420.tar.xz
-tar -xvf WireGuard-0.0.20180420.tar.xz
-cd WireGuard-0.0.20180420/src/
+
+wget https://git.zx2c4.com/WireGuard/snapshot/WireGuard-0.0.20181218.tar.xz
+tar -xvf WireGuard-0.0.20181218.tar.xz
+cd WireGuard-0.0.20181218/src/
 make
 make install
 SCRIPT
@@ -57,5 +63,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       net.vm.provision :shell, inline: $bootstrap, :args => "#{net_ip}"
     end
   end
-
 end

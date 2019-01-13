@@ -59,6 +59,15 @@ var rootCmd = &cobra.Command{
 }
 
 func backendFactory() (backend.Backend, error) {
+	// vault backend
+	vaultBackend := viper.GetString("vault")
+	if len(vaultBackend) >= 0 {
+		b, err := backend.NewVaultBackend(vaultBackend)
+		if err != nil {
+			return nil, err
+		}
+		return b, nil
+	}
 	// etcd backend
 	etcdBackend := viper.GetStringSlice("etcd")
 	if len(etcdBackend) > 0 {
@@ -90,7 +99,7 @@ func backendFactory() (backend.Backend, error) {
 		return b, nil
 	}
 
-	return nil, fmt.Errorf("No storage backend selected, available backends: [etcd, http]")
+	return nil, fmt.Errorf("No storage backend selected, available backends: [etcd, http, vault]")
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -108,6 +117,7 @@ func init() {
 	pflags.String("endpoint", "", "endpoint for this machine, e.g: 192.168.1.3")
 	pflags.String("endpoint-port", "2345", "endpoint port for this machine")
 	pflags.StringSlice("etcd", nil, "array of etcd servers to connect to")
+	pflags.String("vault", "", "vault server to connect to; can be left empty in favor of VAULT_ADDR environment variables")
 	pflags.String("http", "", "the http backend endpoint to use as backend, see also httpbasicauth if you need basic authentication")
 	pflags.String("httpbasicauth", "", "basic auth for the http backend, in form username:password")
 	pflags.String("ifname", "wg0", "the name to use for the interface (must be the same in all the peers)")
@@ -122,6 +132,7 @@ func init() {
 	viper.BindPFlag("endpoint-port", pflags.Lookup("endpoint-port"))
 	viper.BindPFlag("etcd", pflags.Lookup("etcd"))
 	viper.BindPFlag("http", pflags.Lookup("http"))
+	viper.BindPFlag("vault", pflags.Lookup("vault"))
 	viper.BindPFlag("httpbasicauth", pflags.Lookup("httpbasicauth"))
 	viper.BindPFlag("ifname", pflags.Lookup("ifname"))
 	viper.BindPFlag("ipaddr", pflags.Lookup("ipaddr"))

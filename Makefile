@@ -8,7 +8,7 @@ all: build
 .PHONY: build
 build:
 	mkdir -p bin
-	go build ${LDFLAGS} -o bin/wirey ./cmd/wirey
+	GOOS=linux GOARCH=amd64 go build ${LDFLAGS} -o bin/wirey ./cmd/wirey
 
 test:
 	go test -v ./...
